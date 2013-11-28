@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../locale/locale.dtd">
+
+<!--
+  * locale.xml
+  *
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Localization strings for the pt_BR (Português (Brasil)) locale.
+  *
+  * $Id$
+  -->
+ 
+<locale name="pt_BR" full_name="Português do Brasil">
+	<message key="plugins.generic.periodicos">Journals in review</message>
+	<message key="plugins.generic.periodicos.name">Periódicos Plugin</message>
+	<message key="plugins.generic.periodicos.description">This plugin implements the functionality of Journals in Review, from the Journal Almanack Braziliense</message>
+	<message key="plugins.generic.periodicos.por_issue.texto">Reviewed journals</message>
+	<message key="plugins.generic.periodicos.por_issue.revistas_acompanhadas">Reviewed journals</message>
+	<message key="plugins.generic.periodicos.por_issue.link_pdf">download all journauls (PDF)</message>
+	<message key="plugins.generic.periodicos.por_issue.disponibilidade">Journal link</message>
+	<message key="plugins.generic.periodicos.por_issue.referencia">Reference</message>
+	<message key="plugins.generic.periodicos.por_issue.responsavel">Reviewer</message>
+	<message key="plugins.generic.periodicos.por_issue.indisponivel">Unavailable</message>
+	<message key="plugins.generic.periodicos.por_issue.outras_revistas">Other journauls at this issue</message>
+	<message key="plugins.generic.periodicos.por_issue.available_in_portuguese">Available in portuguese only</message>
+	<message key="plugins.generic.periodicos.por_issue.issn">ISSN</message>
+	
+	<message key="plugins.generic.periodicos.admin.erro.nome_repetido">Já existe um periódico com esse nome</message>
+	<message key="plugins.generic.periodicos.admin.listar_periodicos">Listagem de periódicos</message>
+	<message key="plugins.generic.periodicos.admin.criar_periodicos">Criar novo periódico</message>
+	<message key="plugins.generic.periodicos.admin.editar_periodicos">Editar periódico</message>
+	<message key="plugins.generic.periodicos.admin.manage_periodicos">Periódicos dessa edição</message>
+	<message key="plugins.generic.periodicos.admin.edit_edicao_periodico">Editar edição de periódico</message>
+
+	<message key="plugins.generic.periodicos.admin.editando.edicao">Editando</message>
+	<message key="plugins.generic.periodicos.admin.editando.confirma_delete_periodicos">Esse comando irá apagar o periódico selecionado e todas as resenhas relacionadas. \n\nConfirmar operação? </message>
+	<message key="plugins.generic.periodicos.admin.editando.confirma_delete_periodicos">Esse comando irá apagar a edição do periódico selecionado e todas as resenhas relacionadas. \n\nConfirmar operação? </message>
+	<message key="plugins.generic.periodicos.admin.editando.artigo">Editar resenha</message>
+	<message key="plugins.generic.periodicos.admin.inserindo.artigo">Criar nova resenha</message>
+	<message key="plugins.generic.periodicos.admin.editando.artigo_titulo">Editando resenha</message>
+	<message key="plugins.generic.periodicos.admin.manage_vincular">Vincular periódico a essa edição</message>
+	<message key="plugins.generic.periodicos.admin.manage_">Vincular periódico a essa edição</message>
+	
+	<message key="navigation.userHome"></message>
+	<message key="navigation.expediente">boards and staff</message>
+	<message key="navigation.normas_publicacao">editorial guidelines</message>
+
+	<message key="user.role.editor">Editor</message>
+	<message key="search.advanced">Advanced search</message>
+	<message key="navigation.sendtext">Send your text</message>
+
+</locale>

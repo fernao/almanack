@@ -1,0 +1,55 @@
+/* listagem de edicoes  */
+body.issue div.issue div.title {
+    margin-top: -21px;
+}
+
+body.issue div#main {
+}
+
+body.issue div.issue {
+
+}
+
+body.issue div.year { 
+    width: 175px;
+}
+
+body.issue div.issue div.issueCoverImage {
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+}
+
+body.issue #header div#busca {
+    margin-bottom: 0px;
+}
+
+div#busca {
+    height: 85px;
+    margin-right: 20px;
+	
+}
+
+body.article_page {
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+}
+
+/* periodicos */
+.periodicos .artigo {
+    background-color: #fff !important;
+}
+
+
+#navbar a {
+    font-size: 0.55em;
+}
+
+.rt select.selectMenu {
+    font-size: 0.5em !important;
+}
+
+body.rt {
+    margin: 0;
+}

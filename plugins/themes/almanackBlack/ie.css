@@ -1,0 +1,102 @@
+body {
+  text-align: center;
+}
+
+div#header {
+    width: 960px !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div#container, .article_page div#container, .article_page #header #logo_imagem {   
+    margin: 0px !important;
+    width: 960px !important;
+    text-align: center;
+}
+
+.article_page div#header {
+   width: 960px !important;
+}
+
+body.article_page {
+}
+
+div#body {
+    width: 960px;
+}
+
+div#main {
+  margin-top: 20px;
+  width: 780px;
+}
+
+div#sidebar{ 
+  width: 180px;
+}
+
+.pages div#content {
+    margin-top: 14px;
+    width: 567px;
+}
+
+.issue div#titulo_cabecalho_corpo { 
+    width: 360px; 
+} 
+
+#data_cabecalho_corpo {
+   width: 210px;
+}
+
+div.almanack_titulo {
+    width: 350px;
+}
+
+.rt #body {
+    width: 150px;
+}
+.rt #content {
+    margin-left: 0px;
+}
+.rt #main {
+    width: 150px;
+}
+.rt #header {
+    width: 150px;
+}
+.rt #container {
+    min-width: 150px !important;
+    max-width: 150px;
+}
+
+.rt .rtBlock select.selectMenu {
+    font-size: 0.8em !important;    
+}
+
+body.index div#logos ul li, #footer ul li {
+    display: inline;
+}
+
+div#sidebar div#leftSidebar {
+  display: block;
+}
+
+body.article_page {
+    overflow: visible;
+}
+
+.article_page div#body, .article_page div#header, .article_page div#headerTitle {
+    width: 100% !important;
+}
+
+#issn {
+   margin-left: 339px !important;
+}
+
+#footer div#busca {
+   margin-left: 300px;
+   width: 643px;
+}
+
+#breadcrumb_alt {
+   margin-top: -9px !important;
+}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../locale/locale.dtd">
+
+<!--
+  * locale.xml
+  *
+  * Localization strings for the en_US (U.S. English) locale.
+  *
+  -->
+ 
+<locale name="en_US" full_name="U.S. English">
+	<message key="plugins.generic.articlesExtras.displayName">Articles Extras</message>
+	<message key="plugins.generic.articlesExtras.description">This plugin allows editors to manage additional article's content.</message>
+	<message key="plugins.generic.articlesExtras.editContent">Edit content.</message>
+
+	<message key="plugins.generic.articlesExtras.body">Add/Edit Article's Body</message>
+	<message key="plugins.generic.articlesExtras.images">Add/Edit Article's Body's images</message>
+	<message key="plugins.generic.articlesExtras.citations">Add/Edit Article's Bibliographic References</message>
+
+	<message key="plugins.generic.articlesExtras.selectIssue.name">Select Issue.</message>
+	<message key="plugins.generic.articlesExtras.selectArticle.name">Select Article.</message>
+	
+	<message key="plugins.generic.articlesExtras.editCitations">Edit Bibliographic References</message>
+	<message key="plugins.generic.articlesExtras.editImages">Edit Images</message>
+	
+	<message key="plugins.generic.articlesExtras.form.introduction">The content exposed in this plugin is used as base for some import/export plugins such as SciELO, generic galleys, etc.</message>
+	<message key="plugins.generic.articlesExtras.form.body">Article's Body</message>
+	<message key="plugins.generic.articlesExtras.form.newcitation">New Bibliographic References</message>
+        <message key="plugins.generic.articlesExtras.form.nocurrentcitations">There are currently no bibliographic references in this article. To create a new one, please use the form provided at the bottom of this page.</message>
+	<message key="plugins.generic.articlesExtras.form.citations.desc"><![CDATA[There bibliographic references must be in Vancouver citation Format. Ej: <br />Sánchez AS, Torres LA, Mena RG, Cabarroca FC. Cirugía torácica asistida por video. Experiencias en el Hospital “Dr. Gustavo Aldereguía Lima”. MediSur [serie en Internet]. 2008 marzo 25; [citado 2008 abril 19]; 6(1):[aprox. p.]. Disponible en: http://www.medisur.sld.cu/index.php/medisur/article/view/348 ]]></message>
+		
+	<message key="plugins.generic.articlesExtras.citations.authors">Authors</message>
+	<message key="plugins.generic.articlesExtras.citations.title">Title</message>
+        <message key="plugins.generic.articlesExtras.citations.typetitle">Type in Title</message>
+	<message key="plugins.generic.articlesExtras.citations.source">Source</message>
+        <message key="plugins.generic.articlesExtras.citations.typesource">Type in source</message>
+	<message key="plugins.generic.articlesExtras.citations.date">Publication date</message>
+        <message key="plugins.generic.articlesExtras.citations.dateweb">Website date</message>
+	<message key="plugins.generic.articlesExtras.citations.volume">Volume</message>
+        <message key="plugins.generic.articlesExtras.citations.supplvolume">Volume's Supplement</message>
+        <message key="plugins.generic.articlesExtras.citations.partvolume">Volume's Part</message>
+	<message key="plugins.generic.articlesExtras.citations.issue">Issue</message>
+        <message key="plugins.generic.articlesExtras.citations.supplissue">Issue's Supplement</message>
+        <message key="plugins.generic.articlesExtras.citations.partissue">Issue's Part</message>
+	<message key="plugins.generic.articlesExtras.citations.pages">Pages</message>
+        <message key="plugins.generic.articlesExtras.citations.pagewebsite">Page (Website)</message>
+        <message key="plugins.generic.articlesExtras.citations.pagecount">Pages (Aprox. )</message>
+	<message key="plugins.generic.articlesExtras.citations.pages.from">From</message>
+	<message key="plugins.generic.articlesExtras.citations.pages.to">To</message>
+	<message key="plugins.generic.articlesExtras.citations.retractionin">Retraction in</message>
+        <message key="plugins.generic.articlesExtras.citations.retractionof">Retraction of</message>
+        <message key="plugins.generic.articlesExtras.citations.correction">Correction in</message>
+	<message key="plugins.generic.articlesExtras.citations.epub">Electronic Publication</message>
+	<message key="plugins.generic.articlesExtras.citations.erratum">Erratum in</message>
+	<message key="plugins.generic.articlesExtras.citations.republished">Republished</message>
+	<message key="plugins.generic.articlesExtras.citations.discussion">Discussion</message>
+	<message key="plugins.generic.articlesExtras.citations.type">Type</message>
+	<message key="plugins.generic.articlesExtras.citations.part">Part</message>
+	<message key="plugins.generic.articlesExtras.citations.supp">Supplement</message>
+	<message key="plugins.generic.articlesExtras.citations.orgAuthors">Organization as Author</message>
+	<message key="plugins.generic.articlesExtras.citations.databaseUID">Database UID</message>
+	<message key="plugins.generic.articlesExtras.citations.edition">Edition</message>
+	<message key="plugins.generic.articlesExtras.citations.editors">Editor(s)</message>
+	<message key="plugins.generic.articlesExtras.citations.pubPlace">Publication Place</message>
+	<message key="plugins.generic.articlesExtras.citations.editorial">Editorial</message>
+	<message key="plugins.generic.articlesExtras.citations.book">Book</message>
+        <message key="plugins.generic.articlesExtras.citations.bookchapter">Book chapter</message>
+	<message key="plugins.generic.articlesExtras.citations.conference">Conference</message>
+	<message key="plugins.generic.articlesExtras.citations.confArticle">Conference Article</message>
+        <message key="plugins.generic.articlesExtras.citations.sponsor">Sponsor</message>
+	<message key="plugins.generic.articlesExtras.citations.state_country">State/Country</message>
+	<message key="plugins.generic.articlesExtras.citations.city">City</message>
+        <message key="plugins.generic.articlesExtras.citations.state">State</message>
+	<message key="plugins.generic.articlesExtras.citations.patentUID">Patent UID</message>
+	<message key="plugins.generic.articlesExtras.citations.report">Report</message>
+	<message key="plugins.generic.articlesExtras.citations.contract">Contract</message>
+	<message key="plugins.generic.articlesExtras.citations.sponsored">Sponsored by</message>
+	<message key="plugins.generic.articlesExtras.citations.c">C</message>
+	<message key="plugins.generic.articlesExtras.citations.c.from">From</message>
+	<message key="plugins.generic.articlesExtras.citations.c.to">To</message>
+	<message key="plugins.generic.articlesExtras.citations.citdate">Citation date</message>
+        <message key="plugins.generic.articlesExtras.citations.upddate">Last update</message>
+	<message key="plugins.generic.articlesExtras.citations.url">URL</message>
+	<message key="plugins.generic.articlesExtras.citations.updated">Updated</message>
+	<message key="plugins.generic.articlesExtras.citations.makeCitation">New Reference</message>
+	<message key="plugins.generic.articlesExtras.citations.language">Language</message>
+	<message key="plugins.generic.articlesExtras.citations.uid">UID</message>
+	<message key="plugins.generic.articlesExtras.citations.pageTitle">Page title</message>
+	<message key="plugins.generic.articlesExtras.citations.screens">Screens</message>
+	<message key="plugins.generic.articlesExtras.citations.section">Section (Newspaper)</message>
+	<message key="plugins.generic.articlesExtras.citations.col">Column (Newspaper)</message>
+	<message key="plugins.generic.articlesExtras.citations.partTitle">Part title</message>
+        <message key="plugins.generic.articlesExtras.citations.forthcoming">Forthcoming (In Press)</message>
+        <message key="plugins.generic.articlesExtras.citations.add">Add</message>
+        
+        <message key="plugins.generic.articlesExtras.citation.in">In</message>
+        <message key="plugins.generic.articlesExtras.citation.editors">editors</message>
+        <message key="plugins.generic.articlesExtras.citation.updated">updated</message>
+        <message key="plugins.generic.articlesExtras.citation.cited">cited</message>
+        <message key="plugins.generic.articlesExtras.citation.availablefrom">Avaidable From</message>
+        <message key="plugins.generic.articlesExtras.citation.forthcoming">Forthcoming</message>
+        <message key="plugins.generic.articlesExtras.citation.sect">Sect</message>
+        <message key="plugins.generic.articlesExtras.citation.discussion">discussion</message>
+        <message key="plugins.generic.articlesExtras.citation.corrected_republished_from">Corrected and republished from</message>
+        <message key="plugins.generic.articlesExtras.citation.retraction">Retraction</message>
+        <message key="plugins.generic.articlesExtras.citation.of">of</message>
+        <message key="plugins.generic.articlesExtras.citation.in">in</message>
+</locale>

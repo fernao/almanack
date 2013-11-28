@@ -1,0 +1,630 @@
+/**
+ * UnCommon Theme
+ * Copyright (c) Jon Whipple
+ * based on the common.css design by John Willinky
+ * 
+ * based on common.css
+ *
+ * Copyright (c) 2003-2009 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ *
+ * $Id: uncommon.css,v 1.4.2.1 2009/04/08 19:43:27 asmecher Exp $
+ */
+
+/**
+ * Common HTML elements
+ */
+
+body {
+	background-color: #fff;
+	color: #000;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+a:link {
+	color: #333;
+}
+
+a:active {
+	color: #999;
+}
+
+a:visited {
+	color: #666;
+}
+
+a:hover {
+	color: #aaa;
+	background: #000;
+}
+
+/* principais */
+div#container {
+    margin-left: auto;
+    margin-right: auto;
+    width: 1000px;
+}
+
+div#header {
+    padding-top:20px;
+    width: 1000px;  /* tamanho maximo do layout */
+    height: 120px;
+}
+
+div#body  {
+    width: 1000px;  /* tamanho maximo do layout */
+}
+
+div#sidebar {
+    width: 160px;  /* tamanho da lateral */
+    float: left;
+    margin-top: 10px;
+}
+
+div#main {
+    float: left;
+    width: 800px;  /* tamanho do meio */    
+}
+
+/* subs */
+div#leftSidebar {
+    float: none;
+}
+
+
+label.error {
+	color: #900;
+}
+
+input {
+	border: 1px solid #333;
+}
+
+input.textField, select.selectMenu, textarea.textArea, input.uploadField {
+	background-color: #ffffff;
+	color: #333333;
+	border: 1px solid #333;
+}
+
+input.button {
+	background-color: #ccc;
+}
+
+input.defaultButton {
+	background-color: #3399CC;
+	color: #eee;
+}
+
+/* footer */
+#footer {
+    min-height: 35px;
+    background-color: #fff;
+    color:  #666;
+    text-align: left;
+}
+
+#footer div.identificacao {
+    border-top: 1px solid #666;
+    font-size: 0.7em;
+    text-align: center;
+    padding:15px;
+}
+
+#footer ul li {
+    display: inline;
+    vertical-align: middle;
+}
+
+#footerContent {
+	color:  #ffffff;
+}
+
+div#main {
+    padding: 1px;
+    margin: 1px;
+}
+
+#main h2 {
+	font-family:  Verdana,Arial,Helvetica,sans-serif;
+	font-weight: bold;
+	color: #333;
+}
+
+#main h3 {
+	font-family:  Verdana,Arial,Helvetica,sans-serif;
+	font-weight: bold;
+	color: #333;
+}
+
+#breadcrumb, #breadcrumb_alt {
+	color: #666666;
+	padding-top: 0px;
+}
+
+#content {
+    margin-left: 0px;
+    border-top: 0;
+}
+
+#footer #logos {
+    text-align: center;
+}
+
+#footer ul li {
+    display: inline-block;
+}
+
+#footer ul {
+    margin: 0;
+    padding: 0px;
+}
+
+#footer #logos img {
+    border: 0;
+    padding: 5px;
+}
+
+#footer a:hover {
+    background-color: #fff;
+}
+
+/* citar */
+.rt {
+    float: right;
+    font-size: 0.7em;
+}
+
+.rt span.blockTitle {
+    font-size: 1.2em;
+}
+.rt_page div#header, .rt_page div#main, .rt_page div#container {
+    width: 500px !important;
+}
+
+#sidebarRTArticleTools {
+  width: 180px;
+}
+
+/* header */
+#header {
+    background-color: #fff;
+}
+
+#headerTitle {
+    height: 120px;
+
+}
+#header img {
+    border: 0;
+}
+#header a:hover  {
+    background: none;
+}
+#header #logo_texto {
+    float: left;
+}
+#header #logo_imagem {
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #000;   
+    line-height: 75%;
+    text-align: right;
+}
+
+
+/* escondendo divs necessarias */
+#sidebarNavigation, #sidebarLanguageToggle {
+    display: none;
+}
+
+#header div#busca {
+    float: right;
+    font-size: 0.6em;
+    padding-top: 10px;
+    text-align: right;
+    margin-bottom:-10px;
+}
+
+#header div#busca input#query {
+    width: 200px;
+}
+
+
+/* home */
+#home_apresentacao {
+    text-align: right;
+}
+
+#content h3 {
+    font-family:  Verdana,Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    font-color: #333;
+    font-weight: bold;
+}
+
+#content h4 {
+    font-family:  Verdana,Arial,Helvetica,sans-serif;
+    font-weight: bold;
+    color: #666666;
+}
+
+#content h5 {
+    font-color: #666666;
+}
+
+#leftSidebar div.block {
+    padding: 0.5em 0;
+    margin-bottom: 5px;
+    font-color: #999999;
+}
+
+#rightSidebar div.block {
+	padding: 0.5em 0;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #333;
+	margin-bottom: 5px;
+	font-color: #999999;
+}
+
+#leftSidebar div.block span.blockTitle {
+	padding: 0;
+	font-weight: bold;
+	font-color: #333;
+}
+
+#rightSidebar div.block span.blockTitle {
+	padding: 0;
+	font-weight: bold;
+	font-color: #333;
+}
+
+#leftSidebar div.block span.blockSubtitle {
+	font-weight: bold;
+}
+
+#rightSidebar div.block span.blockSubtitle {
+	font-weight: bold;
+}
+
+pre {
+	background-color: #EEEEFF;
+}
+
+div.separator {
+	border-bottom: 2px solid #333;
+}
+
+/*menu */
+#navbar {
+	border:0;
+}
+
+div#navbar ul.menu li {
+    display:block;
+    padding: 0px;
+}
+
+/* menu de edicao */
+div#content ul.menu {
+    border-bottom: 1px solid #000;
+}
+div#content ul.menu li {
+   border-bottom: 0px;
+   margin-bottom: 0px;
+   background-color: #e0e0e0;
+   padding-left: 5px
+}
+
+/* estilos da listagem de edicoes / arquivo */
+
+div .issues  {
+}
+
+div.issue {
+    margin: 2px;
+    float:left;
+    width: 190px;
+    height: 270px;
+    background: #fff;
+}
+
+div.issue .issueCoverImage
+{
+    padding-left:2px;
+    margin: 4px;
+    
+}
+
+.issueCoverImage img {
+    width: 180px;
+
+}
+
+div#issueCoverImage {
+    text-align: right !important;
+}
+
+div.year {
+    float:left;
+    width: 205px;
+    height: 40px;
+    background: #fff;
+    text-align: left;
+    border-bottom: 2px solid #333;
+}
+
+div.year.title {
+    margin-left:10px;
+}
+
+div #issues_foot {
+    clear:both;
+}
+
+
+/* pagina da issue */
+div#issueDescription, #summary .section {
+    width:400px;
+    margin: 5px;
+    margin-left: 0;
+}
+
+.issue #summary div.section h4.tocSectionTitle {
+    margin-left: 20px;
+}
+
+#summary {
+    width: 100%;
+}
+
+#issueCoverImage, #issueDescription, #issueCoverDescription, #download {
+    float: right;
+}
+
+div#download { 
+    margin-top: 20px;
+}
+
+div#download ul {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+div#download ul li {
+    display: inline;
+    padding-left: 20px;
+}
+
+td.tocTitle {
+    width: 350px !important;
+}
+
+td.tocGalleys {
+    width: 40px !important;
+}
+
+/* article page */
+.article_page div#main {
+    width: 820px;
+}
+
+.article_page div#content {
+    width: 600px !important;
+}
+
+.article_page div#sidebar div#navbar {
+    float: left;
+    margin-top: 100px;
+}
+
+
+/* periodicos */
+div#periodicos_container_menu {
+    border-top: 2px solid #000;
+    float:right;
+    width: 230px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+div#periodicos_container_menu #baixar_periodicos {
+    border-bottom: 1px solid #000;
+}
+
+div#periodicos_container_content {
+    float:right;
+    width: 530px;
+    margin-top: 10px;
+    padding-right: 20px;
+}
+
+div.edicao_container {
+    margin-bottom: 30px;
+}
+
+div.edicao_titulo {
+    margin-bottom: 10px;
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;
+}
+
+.separator_artigos {
+    border-bottom: 1px solid #999 !important;
+    margin-left: 20px;
+    width: 240px !important;
+}
+
+div.section table.article {
+    margin-left: 20px;
+    width: 380px;
+}
+
+
+/* listagem de edicoes  */
+body.issue div.issue div.issueCoverImage {
+    float: left;
+}
+
+body.issue #header div#busca {
+    margin-bottom: 0px;
+}
+
+body.article_page {
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+}
+
+
+ul#links_artigos {
+    margin-top: 10px;
+    padding-left: 0;
+}
+ul#links_artigos li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+
+#listagem_periodicos h5 {
+    color: #000;
+}
+#listagem_periodicos ul {
+    padding: 0;
+}
+#listagem_periodicos ul li {
+    padding-right: 10px;
+    padding-bottom: 5px;
+    list-style: none;
+}
+
+#caixa_periodico {
+    border-bottom: 1px solid #000;
+}
+
+#titulo_periodico {
+    padding-bottom: 10px;
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;    
+}
+
+#titulo_periodico strong {
+    font-size: 1.4em;
+}
+
+#titulo_periodico a, .edicao_titulo a {
+    text-decoration: none;
+    color: #000;
+}
+#titulo_periodico a:hover {
+    color: #aaa;
+}
+
+#lista_periodicos thead td {
+    border-bottom: 2px solid #333;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+#lista_periodicos a {
+    text-decoration: none;
+}
+
+#lista_periodicos td {
+    border-left: 1px dotted #ccc;
+    padding: 4px;
+    border-bottom: 1px dotted #ccc;
+}
+
+#lista_periodicos .title {
+    font-weight: bold;
+}
+
+td.delete {
+    text-align:center;
+}
+
+td.delete p, span.delete {
+    font-size: 1.4em; 
+    color: #c00; 
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form_periodico {
+    border-top: 2px solid #000;
+    padding-top: 10px;
+}
+
+/* para forum aparecer junto com artigos*/
+/*
+#section-25 {
+    width: 400px !important;
+    padding-left: 20px;    
+}
+div.separator.section-26 {
+    display:none;
+}
+*/
+
+#summary .separator {
+    width: 400px;
+}
+
+/* outros */
+
+.edicao_titulo a:hover {
+    background: #fff;
+}
+
+.artigo {
+    background: #ccc;
+    padding-bottom: 20px;
+    text-align: justify;
+}
+
+.artigo h5 {
+    padding-left:10px
+}
+
+/* paginas estaticas */
+#apresentacao, #estatica {
+    width: 600px;
+    margin-left:120px;
+}
+
+h3#anterior_titulo {
+    cursor: pointer;
+}
+
+body.editores #breadcrumb,
+body.conselho #breadcrumb,
+body.apoio #breadcrumb {
+    display:none;
+}
+
+#breadcrumb_alt {
+    margin-top:-16px;
+}
+
+#breadcrumb_alt a {
+    text-decoration: none;
+}
+
+/* envio */
+.condicional_submit {
+    display: none;
+    margin-left: 40px;
+}
+
+/* rolagem */
+.article_page #header #logo_imagem, .article_page div#container {
+    width: 1000px !important;
+}
+.article_page div#body, .article_page div#header, .article_page div#headerTitle {
+    width: 100% !important;
+}
+.article_page div#content {
+    padding-left: 10px;
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE schema SYSTEM "../../../dbscripts/xml/dtd/xmlschema.dtd">
+
+<!--
+  * schema.xml
+  *
+  * Copyright (c) 2010 Fernão Lopes
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * 'Periódicos em revsita' plugin schema in XML.
+  *
+  * $Id
+  -->
+
+<schema version="0.2">
+
+	<!--
+	 *
+	 * TABLE periodicos
+	 *
+	 -->
+	<table name="periodicos">
+		<field name="periodico_id" type="I8">
+			<KEY/>
+			<AUTOINCREMENT/>
+		</field>
+		<field name="journal_id" type="I8">
+			<NOTNULL/>
+		</field>
+		<field name="nome" type="C2" size="255">
+			<NOTNULL/>
+		</field>
+		<field name="issn" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<field name="acesso" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<field name="local" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<field name="link" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<descr>Periodicos em revista - Revista</descr>
+		<index name="revista_id">
+			<col>revista_id</col>
+		</index>
+	</table>
+
+
+	<!--
+	 *
+	 * TABLE periodicos_artigo
+	 *
+	 -->
+	<table name="periodicos_artigo">
+		<field name="periodico_artigo_id" type="I8">
+			<KEY/>
+			<AUTOINCREMENT/>
+		</field>
+		<field name="periodico_edicao_id" type="I8">
+		</field>
+		<field name="article_id" type="I8">
+		</field>
+		<field name="referencia" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<descr>Periodicos em revista - Edição revista</descr>
+		<index name="periodico_artigo_id">
+			<col>periodico_artigo_id</col>
+		</index>
+	</table>
+	
+	<!--
+	 *
+	 * TABLE periodicos_edicao
+	 *
+	 -->
+	<table name="periodicos_edicao">
+		<field name="periodico_edicao_id" type="I8">
+			<KEY/>
+			<AUTOINCREMENT/>
+		</field>
+		<field name="issue_id" type="I8">
+		</field>
+		<field name="periodico_id" type="I8">
+		</field>
+		<field name="edicao" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<field name="responsavel" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<field name="referencia" type="C2" size="255">
+			<NOTNULL/>
+			<DEFAULT VALUE=""/>
+		</field>
+		<index name="periodico_edicao_id">
+			<col>periodico_edicao_id</col>
+		</index>
+	</table>
+</schema>
