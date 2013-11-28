@@ -1,0 +1,730 @@
+--- ArticleHandler.inc.php	2010-12-10 11:41:31.000000000 -0200
++++ ../../../almanack.2321/pages/article/ArticleHandler.inc.php	2010-09-21 19:02:13.000000000 -0300
+@@ -3,7 +3,7 @@
+ /**
+  * @file ArticleHandler.inc.php
+  *
+- * Copyright (c) 2003-2010 John Willinsky
++ * Copyright (c) 2003-2009 John Willinsky
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * @class ArticleHandler
+@@ -13,60 +13,171 @@
+  *
+  */
+ 
++// $Id$
+ 
+-import('classes.rt.ojs.RTDAO');
+-import('classes.rt.ojs.JournalRT');
+-import('classes.handler.Handler');
+-import('classes.rt.ojs.SharingRT');
++
++import('rt.ojs.RTDAO');
++import('rt.ojs.JournalRT');
++import('handler.Handler');
++import('rt.ojs.SharingRT');
+ 
+ class ArticleHandler extends Handler {
+ 	/** journal associated with the request **/
+ 	var $journal;
+-
++	
+ 	/** issue associated with the request **/
+ 	var $issue;
+-
++	
+ 	/** article associated with the request **/
+ 	var $article;
+ 
+ 	/**
+ 	 * Constructor
+-	 * @param $request Request
+-	 */
+-	function ArticleHandler(&$request) {
+-		parent::Handler($request);
+-		$router =& $request->getRouter();
+-
++	 **/
++	function ArticleHandler() {
++		parent::Handler();
++		
+ 		$this->addCheck(new HandlerValidatorJournal($this));
+-		$this->addCheck(new HandlerValidatorCustom($this, false, null, null, create_function('$journal', 'return $journal->getSetting(\'publishingMode\') != PUBLISHING_MODE_NONE;'), array($router->getContext($request))));
++		$this->addCheck(new HandlerValidatorCustom($this, false, null, null, create_function('$journal', 'return $journal->getSetting(\'publishingMode\') != PUBLISHING_MODE_NONE;'), array(Request::getJournal())));
+ 	}
+ 
+ 	/**
+ 	 * View Article.
+-	 * @param $args array
+-	 * @param $request Request
+ 	 */
+-	function view($args, &$request) {
+-		$router =& $request->getRouter();
++	function view($args) {
+ 		$articleId = isset($args[0]) ? $args[0] : 0;
+ 		$galleyId = isset($args[1]) ? $args[1] : 0;
+ 
+-		$this->validate($request, $articleId, $galleyId);
++		$this->setupTemplate();
++		$this->validate($articleId, $galleyId);
++
+ 		$journal =& $this->journal;
+ 		$issue =& $this->issue;
+ 		$article =& $this->article;
++
++		$rtDao =& DAORegistry::getDAO('RTDAO');
++		$journalRt = $rtDao->getJournalRTByJournal($journal);
++
++		$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
++		if ($journal->getSetting('enablePublicGalleyId')) {
++			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
++		} else {
++			$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
++		}
++
++		if (!$journalRt->getEnabled()) {
++			if (!$galley || $galley->isHtmlGalley()) return $this->viewArticle($args);
++			else if ($galley->isPdfGalley()) return $this->viewPDFInterstitial($args, $galley);
++			else if ($galley->isInlineable()) {
++				import('file.ArticleFileManager');
++				$articleFileManager = new ArticleFileManager($article->getArticleId());
++				return $articleFileManager->viewFile($galley->getFileId());
++			} else return $this->viewDownloadInterstitial($args, $galley);
++		}
++
++		if (!$article) {
++			Request::redirect(null, Request::getRequestedPage());
++			return;
++		}
++
++		$templateMgr =& TemplateManager::getManager();
++		$templateMgr->assign('articleId', $articleId);
++		$templateMgr->assign_by_ref('article', $article);
++		$templateMgr->assign('galleyId', $galleyId);
++		$templateMgr->assign_by_ref('galley', $galley);
++
++		$templateMgr->display('article/view.tpl');
++	}
++
++	/**
++	 * Article interstitial page before PDF is shown
++	 */
++	function viewPDFInterstitial($args, $galley = null) {
++		$articleId = isset($args[0]) ? $args[0] : 0;
++		$galleyId = isset($args[1]) ? $args[1] : 0;
++		$this->validate($articleId, $galleyId);
++		$journal =& $this->journal;
++		$issue =& $this->issue;
++		$article =& $this->article;		
++		$this->setupTemplate();
++
++		if (!$galley || !is_a($galley, 'ArticleGalley')) {
++			unset($galley);
++			$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
++			if ($journal->getSetting('enablePublicGalleyId')) {
++				$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
++			} else {
++				$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
++			}
++		}
++
++		if (!$galley) Request::redirect(null, null, 'view', $articleId);
++
++		$templateMgr =& TemplateManager::getManager();
++		$templateMgr->assign('articleId', $articleId);
++		$templateMgr->assign('galleyId', $galleyId);
++		$templateMgr->assign_by_ref('galley', $galley);
++		$templateMgr->assign_by_ref('article', $article);
++
++		$templateMgr->display('article/pdfInterstitial.tpl');
++	}
++
++	/**
++	 * Article interstitial page before a non-PDF, non-HTML galley is
++	 * downloaded
++	 */
++	function viewDownloadInterstitial($args, $galley = null) {
++		$articleId = isset($args[0]) ? $args[0] : 0;
++		$galleyId = isset($args[1]) ? $args[1] : 0;
++		$this->validate($articleId, $galleyId);
++		$journal =& $this->journal;
++		$issue =& $this->issue;
++		$article =& $this->article;		
++		$this->setupTemplate();
++
++		if (!$galley || !is_a($galley, 'ArticleGalley')) {
++			unset($galley);
++			$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
++			if ($journal->getSetting('enablePublicGalleyId')) {
++				$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
++			} else {
++				$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
++			}
++		}
++
++		if (!$galley) Request::redirect(null, null, 'view', $articleId);
++
++		$templateMgr =& TemplateManager::getManager();
++		$templateMgr->assign('articleId', $articleId);
++		$templateMgr->assign('galleyId', $galleyId);
++		$templateMgr->assign_by_ref('galley', $galley);
++		$templateMgr->assign_by_ref('article', $article);
++
++		$templateMgr->display('article/interstitial.tpl');
++	}
++
++	/**
++	 * Article view
++	 */
++	function viewArticle($args) {
++		$articleId = isset($args[0]) ? $args[0] : 0;
++		$galleyId = isset($args[1]) ? $args[1] : 0;
++
++		$this->validate($articleId, $galleyId);
++		$journal =& $this->journal;
++		$issue =& $this->issue;
++		$article =& $this->article;		
+ 		$this->setupTemplate();
+ 
+ 		$rtDao =& DAORegistry::getDAO('RTDAO');
+ 		$journalRt = $rtDao->getJournalRTByJournal($journal);
+ 
+ 		$sectionDao =& DAORegistry::getDAO('SectionDAO');
+-		$section =& $sectionDao->getSection($article->getSectionId(), $journal->getId(), true);
++		$section =& $sectionDao->getSection($article->getSectionId());
+ 
+-		$version = null;
+ 		if ($journalRt->getVersion()!=null && $journalRt->getDefineTerms()) {
+ 			// Determine the "Define Terms" context ID.
+-			$version = $rtDao->getVersion($journalRt->getVersion(), $journalRt->getJournalId(), true);
++			$version = $rtDao->getVersion($journalRt->getVersion(), $journalRt->getJournalId());
+ 			if ($version) foreach ($version->getContexts() as $context) {
+ 				if ($context->getDefineTerms()) {
+ 					$defineTermsContextId = $context->getContextId();
+@@ -79,38 +190,22 @@
+ 		$enableComments = $journal->getSetting('enableComments');
+ 
+ 		if (($article->getEnableComments()) && ($enableComments == COMMENTS_AUTHENTICATED || $enableComments == COMMENTS_UNAUTHENTICATED || $enableComments == COMMENTS_ANONYMOUS)) {
+-			$comments =& $commentDao->getRootCommentsBySubmissionId($article->getId());
++			$comments =& $commentDao->getRootCommentsByArticleId($article->getArticleId());
+ 		}
+ 
+ 		$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
+ 		if ($journal->getSetting('enablePublicGalleyId')) {
+-			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getId());
++			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
+ 		} else {
+-			$galley =& $galleyDao->getGalley($galleyId, $article->getId());
+-		}
+-
+-		if ($galley && !$galley->isHtmlGalley() && !$galley->isPdfGalley()) {
+-			if ($galley->isInlineable()) {
+-				$this->viewFile(
+-					array($galley->getArticleId(), $galley->getId()),
+-					$request
+-				);
+-			} else {
+-				$this->download(
+-					array($galley->getArticleId(), $galley->getId()),
+-					$request
+-				);
+-			}
++			$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
+ 		}
+ 
+ 		$templateMgr =& TemplateManager::getManager();
+-		$templateMgr->addJavaScript('js/articleView.js');
+-		$templateMgr->addJavaScript('js/pdfobject.js');
+ 
+ 		if (!$galley) {
+ 			// Get the subscription status if displaying the abstract;
+ 			// if access is open, we can display links to the full text.
+-			import('classes.issue.IssueAction');
++			import('issue.IssueAction');
+ 
+ 			// The issue may not exist, if this is an editorial user
+ 			// and scheduling hasn't been completed yet for the article.
+@@ -118,12 +213,12 @@
+ 				$templateMgr->assign('subscriptionRequired', IssueAction::subscriptionRequired($issue));
+ 			}
+ 
+-			$templateMgr->assign('subscribedUser', IssueAction::subscribedUser($journal, isset($issue) ? $issue->getId() : null, isset($article) ? $article->getId() : null));
+-			$templateMgr->assign('subscribedDomain', IssueAction::subscribedDomain($journal, isset($issue) ? $issue->getId() : null, isset($article) ? $article->getId() : null));
++			$templateMgr->assign('subscribedUser', IssueAction::subscribedUser($journal, isset($issue) ? $issue->getIssueId() : null, isset($article) ? $article->getArticleId() : null));
++			$templateMgr->assign('subscribedDomain', IssueAction::subscribedDomain($journal, isset($issue) ? $issue->getIssueId() : null, isset($article) ? $article->getArticleId() : null));
+ 
+ 			$templateMgr->assign('showGalleyLinks', $journal->getSetting('showGalleyLinks'));
+ 
+-			import('classes.payment.ojs.OJSPaymentManager');
++			import('payment.ojs.OJSPaymentManager');
+ 			$paymentManager =& OJSPaymentManager::getManager();
+ 			if ( $paymentManager->onlyPdfEnabled() ) {
+ 				$templateMgr->assign('restrictOnlyPdf', true);
+@@ -134,55 +229,52 @@
+ 
+ 			// Article cover page.
+ 			$locale = Localex::getLocale();
+-			if (isset($article) && $article->getLocalizedFileName() && $article->getLocalizedShowCoverPage() && !$article->getLocalizedHideCoverPageAbstract()) {
+-				import('classes.file.PublicFileManager');
++			$templateMgr->assign('locale', $locale);
++
++			if (isset($article) && $article->getLocalizedFileName() && $article->getLocalizedShowCoverPage() && !$article->getLocalizedHideCoverPageAbstract($locale)) {
++				import('file.PublicFileManager');
+ 				$publicFileManager = new PublicFileManager();
+-				$coverPagePath = $request->getBaseUrl() . '/';
+-				$coverPagePath .= $publicFileManager->getJournalFilesPath($journal->getId()) . '/';
++				$coverPagePath = Request::getBaseUrl() . '/';
++				$coverPagePath .= $publicFileManager->getJournalFilesPath($journal->getJournalId()) . '/';
+ 				$templateMgr->assign('coverPagePath', $coverPagePath);
+ 				$templateMgr->assign('coverPageFileName', $article->getLocalizedFileName());
+ 				$templateMgr->assign('width', $article->getLocalizedWidth());
+-				$templateMgr->assign('height', $article->getLocalizedHeight());
++				$templateMgr->assign('height', $article->getLocalized());
+ 				$templateMgr->assign('coverPageAltText', $article->getLocalizedCoverPageAltText());
+ 			}
+ 
+-			// References list.
+-			// FIXME: We only display the edited raw citations right now. We also want
+-			// to allow for generated citations to be displayed here (including a way for
+-			// the reader to choose any of the installed citation styles for output), see #5938.
+-			$citationDao =& DAORegistry::getDAO('CitationDAO'); /* @var $citationDao CitationDAO */
+-			$citationFactory =& $citationDao->getObjectsByAssocId(ASSOC_TYPE_ARTICLE, $article->getId());
+-			$templateMgr->assign('citationFactory', $citationFactory);
+-
+ 			// Increment the published article's abstract views count
+-			if (!$request->isBot()) {
++			if (!Request::isBot()) {
+ 				$publishedArticleDao =& DAORegistry::getDAO('PublishedArticleDAO');
+-				$publishedArticleDao->incrementViewsByArticleId($article->getId());
++				$publishedArticleDao->incrementViewsByArticleId($article->getArticleId());
+ 			}
+ 		} else {
+-			if (!$request->isBot() && !$galley->isPdfGalley()) {
+-				// Increment the galley's views count.
+-				// PDF galley views are counted in viewFile.
+-				$galleyDao->incrementViews($galley->getId());
++			if (!Request::isBot()) {
++				// Increment the galley's views count
++				$galleyDao->incrementViews($galley->getGalleyId());
+ 			}
+ 
+ 			// Use the article's CSS file, if set.
+ 			if ($galley->isHTMLGalley() && $styleFile =& $galley->getStyleFile()) {
+-				$templateMgr->addStyleSheet($router->url($request, null, 'article', 'viewFile', array(
+-					$article->getId(),
++				$templateMgr->addStyleSheet(Request::url(null, 'article', 'viewFile', array(
++					$article->getArticleId(),
+ 					$galley->getBestGalleyId($journal),
+ 					$styleFile->getFileId()
+ 				)));
+ 			}
+ 		}
+ 
++		// Add font sizer js and css if not already in header
++		$additionalHeadData = $templateMgr->get_template_vars('additionalHeadData');
++		if (strpos(strtolower($additionalHeadData), 'sizer.js') === false) {
++			$additionalHeadData .= $templateMgr->fetch('common/sizer.tpl');
++			$templateMgr->assign('additionalHeadData', $additionalHeadData);
++		}
++
+ 		$templateMgr->assign_by_ref('issue', $issue);
+ 		$templateMgr->assign_by_ref('article', $article);
+ 		$templateMgr->assign_by_ref('galley', $galley);
+ 		$templateMgr->assign_by_ref('section', $section);
+-		$templateMgr->assign_by_ref('journalRt', $journalRt);
+-		$templateMgr->assign_by_ref('version', $version);
+-		$templateMgr->assign_by_ref('journal', $journal);
+ 		$templateMgr->assign('articleId', $articleId);
+ 		$templateMgr->assign('postingAllowed', (
+ 			($article->getEnableComments()) && (
+@@ -191,16 +283,14 @@
+ 			$enableComments == COMMENTS_ANONYMOUS) &&
+ 			Validation::isLoggedIn()))
+ 		));
+-		$templateMgr->assign('enableComments', $enableComments);
+-		$templateMgr->assign('postingLoginRequired', ($enableComments != COMMENTS_ANONYMOUS && !Validation::isLoggedIn()));
+ 		$templateMgr->assign('galleyId', $galleyId);
+ 		$templateMgr->assign('defineTermsContextId', isset($defineTermsContextId)?$defineTermsContextId:null);
+ 		$templateMgr->assign('comments', isset($comments)?$comments:null);
+-
++		
+ 		$templateMgr->assign('sharingEnabled', $journalRt->getSharingEnabled());
+-
++		
+ 		if($journalRt->getSharingEnabled()) {
+-			$templateMgr->assign('sharingRequestURL', $request->getRequestURL());
++			$templateMgr->assign('sharingRequestURL', Request::getRequestURL());
+ 			$templateMgr->assign('sharingArticleTitle', $article->getArticleTitle());
+ 			$templateMgr->assign_by_ref('sharingUserName', $journalRt->getSharingUserName());
+ 			$templateMgr->assign_by_ref('sharingButtonStyle', $journalRt->getSharingButtonStyle());
+@@ -216,190 +306,162 @@
+ 			$templateMgr->assign('sharingButtonWidth', $btnWidth);
+ 			$templateMgr->assign('sharingButtonHeight', $btnHeight);
+ 		}
+-
+-		$templateMgr->assign('articleSearchByOptions', array(
+-			'' => 'search.allFields',
+-			ARTICLE_SEARCH_AUTHOR => 'search.author',
+-			ARTICLE_SEARCH_TITLE => 'article.title',
+-			ARTICLE_SEARCH_ABSTRACT => 'search.abstract',
+-			ARTICLE_SEARCH_INDEX_TERMS => 'search.indexTerms',
+-			ARTICLE_SEARCH_GALLEY_FILE => 'search.fullText'
+-		));
+-
+ 		$templateMgr->display('article/article.tpl');
+ 	}
+ 
+ 	/**
+-	 * Article interstitial page before PDF is shown
+-	 * @param $args array
+-	 * @param $request Request
+-	 * @param $galley ArticleGalley
++	 * Article Reading tools
+ 	 */
+-	function viewPDFInterstitial($args, &$request, $galley = null) {
++	function viewRST($args) {
+ 		$articleId = isset($args[0]) ? $args[0] : 0;
+ 		$galleyId = isset($args[1]) ? $args[1] : 0;
+-		$this->validate($request, $articleId, $galleyId);
++
++		$this->validate($articleId, $galleyId);
+ 		$journal =& $this->journal;
+ 		$issue =& $this->issue;
+-		$article =& $this->article;
++		$article =& $this->article;		
+ 		$this->setupTemplate();
+ 
+-		if (!$galley) {
+-			$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
+-			if ($journal->getSetting('enablePublicGalleyId')) {
+-				$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getId());
+-			} else {
+-				$galley =& $galleyDao->getGalley($galleyId, $article->getId());
+-			}
++		$rtDao =& DAORegistry::getDAO('RTDAO');
++		$journalRt = $rtDao->getJournalRTByJournal($journal);
++
++		// The RST needs to know whether this galley is HTML or not. Fetch the galley.
++		$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
++		if ($journal->getSetting('enablePublicGalleyId')) {
++			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
++		} else {
++			$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
+ 		}
+ 
+-		if (!$galley) $request->redirect(null, null, 'view', $articleId);
++		$sectionDao =& DAORegistry::getDAO('SectionDAO');
++		$section =& $sectionDao->getSection($article->getSectionId());
+ 
+ 		$templateMgr =& TemplateManager::getManager();
++		$templateMgr->assign_by_ref('issue', $issue);
++		$templateMgr->assign_by_ref('article', $article);
+ 		$templateMgr->assign('articleId', $articleId);
+ 		$templateMgr->assign('galleyId', $galleyId);
+ 		$templateMgr->assign_by_ref('galley', $galley);
+-		$templateMgr->assign_by_ref('article', $article);
+-
+-		$templateMgr->display('article/pdfInterstitial.tpl');
+-	}
++		$templateMgr->assign_by_ref('journal', $journal);
++		$templateMgr->assign_by_ref('section', $section);
+ 
+-	/**
+-	 * Article interstitial page before a non-PDF, non-HTML galley is
+-	 * downloaded
+-	 * @param $args array
+-	 * @param $request Request
+-	 * @param $galley ArticleGalley
+-	 */
+-	function viewDownloadInterstitial($args, &$request, $galley = null) {
+-		$articleId = isset($args[0]) ? $args[0] : 0;
+-		$galleyId = isset($args[1]) ? $args[1] : 0;
+-		$this->validate($request, $articleId, $galleyId);
+-		$journal =& $this->journal;
+-		$issue =& $this->issue;
+-		$article =& $this->article;
+-		$this->setupTemplate();
++		$templateMgr->assign('articleSearchByOptions', array(
++			'' => 'search.allFields',
++			ARTICLE_SEARCH_AUTHOR => 'search.author',
++			ARTICLE_SEARCH_TITLE => 'article.title',
++			ARTICLE_SEARCH_ABSTRACT => 'search.abstract',
++			ARTICLE_SEARCH_INDEX_TERMS => 'search.indexTerms',
++			ARTICLE_SEARCH_GALLEY_FILE => 'search.fullText'
++		));
+ 
+-		if (!$galley) {
+-			$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
+-			if ($journal->getSetting('enablePublicGalleyId')) {
+-				$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getId());
+-			} else {
+-				$galley =& $galleyDao->getGalley($galleyId, $article->getId());
+-			}
+-		}
++		// Bring in comment constants.
++		$commentDao =& DAORegistry::getDAO('CommentDAO');
+ 
+-		if (!$galley) $request->redirect(null, null, 'view', $articleId);
++		$enableComments = $journal->getSetting('enableComments');
++		$templateMgr->assign('postingAllowed', (
++			$article->getEnableComments() &&
++			$enableComments != COMMENTS_DISABLED
++		));
+ 
+-		$templateMgr =& TemplateManager::getManager();
+-		$templateMgr->assign('articleId', $articleId);
+-		$templateMgr->assign('galleyId', $galleyId);
+-		$templateMgr->assign_by_ref('galley', $galley);
+-		$templateMgr->assign_by_ref('article', $article);
++		$templateMgr->assign('postingDisabled', (
++			($enableComments == COMMENTS_AUTHENTICATED ||
++			$enableComments == COMMENTS_ANONYMOUS) &&
++			!Validation::isLoggedIn())
++		);
+ 
+-		$templateMgr->display('article/interstitial.tpl');
+-	}
++		$templateMgr->assign_by_ref('journalRt', $journalRt);
++		if ($journalRt->getEnabled()) {
++			$version = $rtDao->getVersion($journalRt->getVersion(), $journalRt->getJournalId());
++			if ($version) {
++				$templateMgr->assign_by_ref('version', $version);
++			}
++		}
+ 
+-	/**
+-	 * Article view
+-	 * @param $args array
+-	 * @param $request Request
+-	 */
+-	function viewArticle($args, &$request) {
+-		// This function is deprecated since the Reading Tools frameset was removed.
+-		return $this->view($args, $request);
++		$templateMgr->display('rt/rt.tpl');
+ 	}
+ 
+ 	/**
+ 	 * View a file (inlines file).
+ 	 * @param $args array ($articleId, $galleyId, $fileId [optional])
+-	 * @param $request Request
+ 	 */
+-	function viewFile($args, &$request) {
++	function viewFile($args) {
+ 		$articleId = isset($args[0]) ? $args[0] : 0;
+ 		$galleyId = isset($args[1]) ? $args[1] : 0;
+ 		$fileId = isset($args[2]) ? (int) $args[2] : 0;
+ 
+-		$this->validate($request, $articleId, $galleyId);
++		$this->validate($articleId, $galleyId);
+ 		$journal =& $this->journal;
+ 		$issue =& $this->issue;
+-		$article =& $this->article;
++		$article =& $this->article;		
+ 
+ 		$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
+ 		if ($journal->getSetting('enablePublicGalleyId')) {
+-			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getId());
++			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
+ 		} else {
+-			$galley =& $galleyDao->getGalley($galleyId, $article->getId());
++			$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
+ 		}
+ 
+-		if (!$galley) $request->redirect(null, null, 'view', $articleId);
++		if (!$galley) Request::redirect(null, null, 'view', $articleId);
+ 
+ 		if (!$fileId) {
+-			$galleyDao->incrementViews($galley->getId());
++			$galleyDao->incrementViews($galley->getGalleyId());
+ 			$fileId = $galley->getFileId();
+ 		} else {
+ 			if (!$galley->isDependentFile($fileId)) {
+-				$request->redirect(null, null, 'view', $articleId);
++				Request::redirect(null, null, 'view', $articleId);
+ 			}
+ 		}
+ 
+-		if (!HookRegistry::call('ArticleHandler::viewFile', array(&$article, &$galley, &$fileId))) {
+-			import('classes.submission.common.Action');
+-			Action::viewFile($article->getId(), $fileId);
++		if (!HookRegistry::call('$this->viewFile', array(&$article, &$galley, &$fileId))) {
++			import('submission.common.Action');
++			Action::viewFile($article->getArticleId(), $fileId);
+ 		}
+ 	}
+ 
+ 	/**
+ 	 * Downloads the document
+-	 * @param $args array
+-	 * @param $request Request
+ 	 */
+-	function download($args, &$request) {
++	function download($args) {
+ 		$articleId = isset($args[0]) ? $args[0] : 0;
+ 		$galleyId = isset($args[1]) ? $args[1] : 0;
+-		$this->validate($request, $articleId, $galleyId);
++		$this->validate($articleId, $galleyId);
+ 		$journal =& $this->journal;
+ 		$issue =& $this->issue;
+-		$article =& $this->article;
++		$article =& $this->article;		
+ 
+ 		$galleyDao =& DAORegistry::getDAO('ArticleGalleyDAO');
+ 		if ($journal->getSetting('enablePublicGalleyId')) {
+-			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getId());
++			$galley =& $galleyDao->getGalleyByBestGalleyId($galleyId, $article->getArticleId());
+ 		} else {
+-			$galley =& $galleyDao->getGalley($galleyId, $article->getId());
++			$galley =& $galleyDao->getGalley($galleyId, $article->getArticleId());
+ 		}
+-		if ($galley) $galleyDao->incrementViews($galley->getId());
++		if ($galley) $galleyDao->incrementViews($galley->getGalleyId());
+ 
+ 		if ($article && $galley && !HookRegistry::call('$this->downloadFile', array(&$article, &$galley))) {
+-			import('classes.file.ArticleFileManager');
+-			$articleFileManager = new ArticleFileManager($article->getId());
++			import('file.ArticleFileManager');
++			$articleFileManager = new ArticleFileManager($article->getArticleId());
+ 			$articleFileManager->downloadFile($galley->getFileId());
+ 		}
+ 	}
+ 
+-	/**
+-	 * Download a supplementary file
+-	 * @param $args array
+-	 * @param $request Request
+-	 */
+-	function downloadSuppFile($args, &$request) {
++	function downloadSuppFile($args) {
+ 		$articleId = isset($args[0]) ? $args[0] : 0;
+ 		$suppId = isset($args[1]) ? $args[1] : 0;
+-		$this->validate($request, $articleId);
++		$this->validate($articleId);
+ 		$journal =& $this->journal;
+ 		$issue =& $this->issue;
+-		$article =& $this->article;
++		$article =& $this->article;		
+ 
+ 		$suppFileDao =& DAORegistry::getDAO('SuppFileDAO');
+ 		if ($journal->getSetting('enablePublicSuppFileId')) {
+-			$suppFile =& $suppFileDao->getSuppFileByBestSuppFileId($article->getId(), $suppId);
++			$suppFile =& $suppFileDao->getSuppFileByBestSuppFileId($article->getArticleId(), $suppId);
+ 		} else {
+-			$suppFile =& $suppFileDao->getSuppFile((int) $suppId, $article->getId());
++			$suppFile =& $suppFileDao->getSuppFile((int) $suppId, $article->getArticleId());
+ 		}
+ 
+ 		if ($article && $suppFile) {
+-			import('classes.file.ArticleFileManager');
+-			$articleFileManager = new ArticleFileManager($article->getId());
++			import('file.ArticleFileManager');
++			$articleFileManager = new ArticleFileManager($article->getArticleId());
+ 			if ($suppFile->isInlineable()) {
+ 				$articleFileManager->viewFile($suppFile->getFileId());
+ 			} else {
+@@ -410,36 +472,31 @@
+ 
+ 	/**
+ 	 * Validation
+-	 * @see lib/pkp/classes/handler/PKPHandler#validate()
+-	 * @param $request Request
+-	 * @param $articleId integer
+-	 * @param $galleyId integer
+ 	 */
+-	function validate(&$request, $articleId, $galleyId = null) {
+-		$router =& $request->getRouter();
+-		parent::validate(null, $request);
++	function validate($articleId, $galleyId = null) {
++		parent::validate();
+ 
+-		import('classes.issue.IssueAction');
++		import('issue.IssueAction');
+ 
+-		$journal =& $router->getContext($request);
+-		$journalId = $journal->getId();
++		$journal =& Request::getJournal();
++		$journalId = $journal->getJournalId();
+ 		$article = $publishedArticle = $issue = null;
+-		$user =& $request->getUser();
++		$user =& Request::getUser();
+ 		$userId = $user?$user->getId():0;
+ 
+ 		$publishedArticleDao =& DAORegistry::getDAO('PublishedArticleDAO');
+ 		if ($journal->getSetting('enablePublicArticleId')) {
+-			$publishedArticle =& $publishedArticleDao->getPublishedArticleByBestArticleId((int) $journalId, $articleId, true);
++			$publishedArticle =& $publishedArticleDao->getPublishedArticleByBestArticleId($journalId, $articleId);
+ 		} else {
+-			$publishedArticle =& $publishedArticleDao->getPublishedArticleByArticleId((int) $articleId, (int) $journalId, true);
++			$publishedArticle =& $publishedArticleDao->getPublishedArticleByArticleId((int) $articleId, $journalId);
+ 		}
+ 
+ 		$issueDao =& DAORegistry::getDAO('IssueDAO');
+ 		if (isset($publishedArticle)) {
+-			$issue =& $issueDao->getIssueById($publishedArticle->getIssueId(), $publishedArticle->getJournalId(), true);
++			$issue =& $issueDao->getIssueByArticleId($publishedArticle->getArticleId(), $journalId);
+ 		} else {
+ 			$articleDao =& DAORegistry::getDAO('ArticleDAO');
+-			$article =& $articleDao->getArticle((int) $articleId, $journalId, true);
++			$article =& $articleDao->getArticle((int) $articleId, $journalId);
+ 		}
+ 
+ 		// If this is an editorial user who can view unpublished/unscheduled
+@@ -447,17 +504,14 @@
+ 		if (($article || $publishedArticle) && (($article && IssueAction::allowedPrePublicationAccess($journal, $article) || ($publishedArticle && IssueAction::allowedPrePublicationAccess($journal, $publishedArticle))))) {
+ 			$this->journal =& $journal;
+ 			$this->issue =& $issue;
+-			if(isset($publishedArticle)) {
+-				$this->article =& $publishedArticle;
+-			} else $this->article =& $article;
+-
++			$this->article =& $publishedArticle?$publishedArticle:$article;
+ 			return true;
+ 		}
+ 
+ 		// Make sure the reader has rights to view the article/issue.
+ 		if ($issue && $issue->getPublished()) {
+ 			$subscriptionRequired = IssueAction::subscriptionRequired($issue);
+-			$isSubscribedDomain = IssueAction::subscribedDomain($journal, $issue->getId(), $articleId);
++			$isSubscribedDomain = IssueAction::subscribedDomain($journal, $issue->getIssueId(), $articleId);
+ 
+ 			// Check if login is required for viewing.
+ 			if (!$isSubscribedDomain && !Validation::isLoggedIn() && $journal->getSetting('restrictArticleAccess') && isset($galleyId) && $galleyId != 0) {
+@@ -470,11 +524,11 @@
+ 			     (isset($galleyId) && $galleyId!=0) ) {
+ 
+ 				// Subscription Access
+-				$subscribedUser = IssueAction::subscribedUser($journal, $issue->getId(), $articleId);
++				$subscribedUser = IssueAction::subscribedUser($journal, $issue->getIssueId(), $articleId);
+ 
+ 				if (!(!$subscriptionRequired || $publishedArticle->getAccessStatus() == ARTICLE_ACCESS_OPEN || $subscribedUser)) {
+ 					// if payment information is enabled,
+-					import('classes.payment.ojs.OJSPaymentManager');
++					import('payment.ojs.OJSPaymentManager');
+ 					$paymentManager =& OJSPaymentManager::getManager();
+ 
+ 					if ( $paymentManager->purchaseArticleEnabled() || $paymentManager->membershipEnabled() ) {
+@@ -523,12 +577,12 @@
+ 						if (!Validation::isLoggedIn()) {
+ 							Validation::redirectLogin("reader.subscriptionRequiredLoginText");
+ 						}
+-						$request->redirect(null, 'about', 'subscriptions');
++						Request::redirect(null, 'about', 'subscriptions');
+ 					}
+ 				}
+ 			}
+ 		} else {
+-			$request->redirect(null, 'index');
++			Request::redirect(null, 'index');
+ 		}
+ 		$this->journal =& $journal;
+ 		$this->issue =& $issue;
+@@ -538,7 +592,7 @@
+ 
+ 	function setupTemplate() {
+ 		parent::setupTemplate();
+-		Localex::requireComponents(array(LOCALE_COMPONENT_PKP_READER, LOCALE_COMPONENT_PKP_SUBMISSION));
++		Localex::requireComponents(array(LOCALE_COMPONENT_PKP_READER));
+ 	}
+ }
+ 

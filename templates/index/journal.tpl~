@@ -1,0 +1,50 @@
+{**
+ * index.tpl
+ *
+ * Copyright (c) 2003-2010 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ *
+ * Journal index page.
+ *
+ * $Id: journal.tpl,v 1.28.2.2 2009/05/22 20:10:03 mcrider Exp $
+ *}
+{assign var="pageTitleTranslated" value=$siteTitle}
+{include file="common/header.tpl" hideFirst="1"}
+
+<div>{$journalDescription}</div>
+
+{call_hook name="Templates::Index::journal"}
+
+{if $additionalHomeContent}
+<br />
+{$additionalHomeContent}
+{/if}
+
+{if $enableAnnouncementsHomepage}
+	{* Display announcements *}
+	<div id="announcementsHome">
+		<h3>{translate key="announcement.announcementsHome"}</h3>
+		{include file="announcement/list.tpl"}	
+		<table class="announcementsMore">
+			<tr>
+				<td><a href="{url page="announcement"}">{translate key="announcement.moreAnnouncements"}</a></td>
+			</tr>
+		</table>
+	</div>
+{/if}
+
+<div id="neste_numero">Neste n&uacute;mero</div>
+<div id="home_apresentacao">
+
+{if $issue}
+	{* Display the table of contents or cover page of the current issue. *}
+	<h3>{$issue->getIssueIdentification()|strip_unsafe_html|nl2br}</h3>
+	<hr/>
+{/if}
+
+{debug}
+
+</div>
+
+{include file="common/footer.tpl"}
+
